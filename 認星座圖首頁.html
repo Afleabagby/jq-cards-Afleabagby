@@ -172,9 +172,9 @@
 <div id="content">
     <div id="topic"><h1>選擇模式</h1></div>
     <div id="select">
-        <div class="option" id="op1"><img  src="./cards/images/sign1/1A.png" alt=""><p class="txt" id="modetext-A">圖案</p></div>
-        <div class="option" id="op2"><img src="./cards/images/sign2/1B.png" alt=""><p class="txt" id="modetext-B">星星</p></div>
-        <div class="option" id="op3"><img  src="./cards/images/sign3/1C.png" alt=""><p class="txt" id="modetext-C">簡約</p></div>
+        <div class="option" id="op1"><img  src="./cards/images/sign/1A.png" alt=""><p class="txt" id="modetext-A">圖案</p></div>
+        <div class="option" id="op2"><img src="./cards/images/sign/1B.png" alt=""><p class="txt" id="modetext-B">星星</p></div>
+        <div class="option" id="op3"><img  src="./cards/images/sign/1C.png" alt=""><p class="txt" id="modetext-C">簡約</p></div>
     </div>
     <div id="game"></div>
 </div>
@@ -278,7 +278,7 @@ function game (mode) {
         $(".card").eq(i).find(".front").css("background-image", `url(./cards/images/date/${i + 1}S.png)`);
         $(".card").eq(i).addClass(`card${i + 1}`);
         // 產生圖案
-        $(".card").eq(i + ($(".card").length / 2)).find(".front").css("background-image", `url(./cards/images/sign1/${i + 1}${mode}.png)`);
+        $(".card").eq(i + ($(".card").length / 2)).find(".front").css("background-image", `url(./cards/images/sign/${i + 1}${mode}.png)`);
         $(".card").eq(i + ($(".card").length / 2)).addClass(`card${i + 1}`);
       }
 
