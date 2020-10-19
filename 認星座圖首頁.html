@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+     
+        html{
+            margin:0;
+        }
+        body{
+            /* width:100vw; */
+            /* height:100vh; */
+            background:url('./bg3.jpg') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            align-items:center;
+        }
+
+        #content{
+            width:800px;
+            height:600px;
+            /* background:green; */
+            display: flex;
+            flex-direction: column;
+            align-items:center;
+        }
+
+        #topic{
+            color:white;
+            
+        }
+        #select{
+            width:700px;
+            height:500px;
+            top:50%;
+            left:50%;
+            display:flex;
+            justify-content: space-evenly;
+            background:rgba(0,0,0,0.5);
+            align-items:center;
+        }
+        .option{
+            width:150px;
+            height:150px;
+            filter:opacity(0.5);
+            /* background:rgba(0,0,0,0.5); */
+        }
+        .option .txt{
+          color:rgba(167, 156, 7, 0.5);
+          font-size: 20px;
+          font-weight:900;
+            position:relative;
+            bottom:40%;
+            left:10%;
+            visibility:hidden;
+
+        }
+        .option:hover{
+          cursor:pointer;
+          border:solid 5px rgba(232, 250, 74, 0.5);
+          filter:none;
+        }
+        .option:hover .txt{
+          visibility:visible;
+        }
+      
+
+
+
+
+/* 遊戲介面 */
+     /* .box{
+      background:red;
+      position:absolute;
+      width:500px;
+      height:300px;
+    } */
+
+    /* 計分計時區 */
+    .board{
+        left:10%;
+        width:500px;
+        height:100px;
+        position:absolute;
+        top:10%; 
+         /*預設div是display:block >>>>> 避免壓到下面遊戲區  */
+        pointer-events: none;
+    }
+
+    #text-time{
+        position:absolute;
+        left:15%;
+        bottom:10%;
+        color:seashell;
+        font-family:'微軟正黑體';
+        font-weight:bolder;
+        font-size:20px;
+        pointer-events: none;
+    }
+    #text-score{
+        position:absolute;
+        left:15%;
+        top:15%;
+        color:seashell;
+        font-family:'微軟正黑體';
+        font-weight: bolder;
+        font-size:20px;
+        pointer-events: none;
+    }
+
+
+    /* 翻牌遊戲區 */
+    #game {
+      background:rgba(0,0,0,0.5);
+      width: 700px;
+      height:500px;
+      top:15%;
+      position:absolute;
+      
+    }
+    .card {
+      /* background:red; */
+      border-radius:10%;
+      padding:5px;
+      width: 100px;
+      height: 100px;
+      /* 告訴card裡面是個3d的空間 */
+      transform-style: preserve-3d;
+       /* 疊在一起: 外層relative，內層absolute */
+      position: relative;
+      /* 翻的速度:0.5秒的轉場 */
+      transition: all 0.5s;
+      display: inline-block;
+    }
+
+    /* 蓋起來: 兩隻手再一起轉180度 */
+    .close {
+      transform: rotateY(180deg);
+    }
+    .front {
+      border-radius:10%;
+      width: 90%;
+      height: 90%;
+        /* background-image:url(./撲克牌/1C.jpg); */
+            /* 縮放圖片全部顯示 */
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+    }
+    .back {
+      border-radius:10%;
+      width: 90%;
+      height: 90%;
+      background-image: url('./cards/cardback2.jpg');
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: absolute;
+      /* 顏色背面垂直往下轉: 手背貼手背 */
+      transform: rotateY(180deg);
+    }
+
+
+    </style>
+</head>
+<body>
+
+<div id="content">
+    <div id="topic"><h1>選擇模式</h1></div>
+    <div id="select">
+        <div class="option" id="op1"><img  src="./cards/images/sign1/1A.png" alt=""><p class="txt" id="modetext-A">圖案</p></div>
+        <div class="option" id="op2"><img src="./cards/images/sign2/1B.png" alt=""><p class="txt" id="modetext-B">星星</p></div>
+        <div class="option" id="op3"><img  src="./cards/images/sign3/1C.png" alt=""><p class="txt" id="modetext-C">簡約</p></div>
+    </div>
+    <div id="game"></div>
+</div>
+
+<div class="board">
+  <div><img style="width:50px;height:50px;" src="./score.png" alt=""><span id="text-score">0</span></div>
+  <div><img style="width:50px;height:50px;" src="./timer.png" alt=""><span id="text-time">180</span></div>
+
+</div>
+
+
+
+
+<!-- 遊戲介面 -->
+<!-- <div class="box"> -->
+    
+<!-- </div> -->
+
+
+    <script src="./jquery-3.5.1.min.js"></script>
+    <script src="sweetalert2.all.min.js"></script>
+    <script>
+
+
+
+      
+// 首頁畫面，隱藏遊戲介面與計分計時區
+    $('#game').css('display', 'none')
+    $('.board').css('display', 'none')
+
+
+let score = 0
+let timeleft = 180 
+let gameTimer = 0
+  
+// 翻牌配對
+// 是否點到card，是的話執行function
+$('#game').on('click', '.card', function(){
+// 如果card張數小於2，才可以翻牌>>>>>>>限制翻開張數只有2張
+// .card:not(.close)').length  翻開總張數
+    if( $('.card:not(.close)').length < 2) {
+    $(this).removeClass('close')
+    }
+
+// !!!不能用else if，因為是不一樣的事情
+
+// 如果card張數等於2
+    if( $('.card:not(.close)').length == 2) {
+      // 如果翻開的第一張等於第二張的話，就clear掉
+      if( $('.card:not(.close)').eq(0).attr('class') === $('.card:not(.close)').eq(1).attr('class')) {
+        // 加分
+        if (timeleft > 0) {
+            score += 10;
+            $("#text-score").text(score);
+          }
+      //  就淡出並clear，代表解決
+      $('.card:not(.close)').fadeTo(800, 0).addClass('clear')
+      }
+        
+
+        // delay一秒鐘再翻回來
+        setTimeout(() => {
+        $('.card:not(.close)').addClass('close')
+          }, 1000);
+    }
+
+})
+
+// 遊戲面板
+function game (mode) {
+      $('h1').fadeOut(1000, function() {
+        $('h1').text($(`#modetext-${mode}`).text()).fadeIn(50)
+      })
+        $('.option').fadeOut(1000)
+        $('#game').fadeIn(1000)
+        $('.board').fadeIn(1000)
+
+     // 產出卡片數量 24 張
+      for(let i=0;i<24;i++) {
+      $('#game').fadeIn(1000).append(`
+              <div class="card close">
+              <div class="back"></div>
+              <div class="front"></div>
+              </div>
+          `)
+            }
+      
+      // 重設分數與時間
+      score = 0;
+      $("#text-score").text(score);
+      timeleft = 180;
+      $("#text-time").text(timeleft);
+            
+    // 產生正面:圖案跟日期 
+    // 圖案 12張
+    // 日期 12張  >>>> 總牌數24張再除以二  $(".card").length / 2
+    // 每組牌設置一配對的class
+    // 餘數等於第幾個，加一是因為i從0開始
+    for (let i = 0; i < $(".card").length / 2; i++) {
+        //先產生日期 
+        $(".card").eq(i).find(".front").css("background-image", `url(./cards/images/date/${i + 1}S.png)`);
+        $(".card").eq(i).addClass(`card${i + 1}`);
+        // 產生圖案
+        $(".card").eq(i + ($(".card").length / 2)).find(".front").css("background-image", `url(./cards/images/sign1/${i + 1}${mode}.png)`);
+        $(".card").eq(i + ($(".card").length / 2)).addClass(`card${i + 1}`);
+      }
+
+    // 打亂卡片
+    // 隨機抽一張，移到該張後面
+    // 打亂40次
+    for(let i=0;i<40;i++){
+       const target = Math.floor( Math.random() * $(".card").length )
+       $('.card').eq(target).insertAfter( $(".card").eq(i) )
+    }
+
+  //遊戲進行中 
+
+  
+// 遊戲倒數計時器
+gameTimer = setInterval(() => {
+          timeleft--
+           $("#text-time").text(timeleft)
+           // 如果進入倒數十秒，倒數數字變成紅色
+           if(timeleft<=10){
+            $("#text-time").css('color', 'red')
+           }
+
+          //  如果都配對完
+           if($('.clear').length == $(".card").length) {
+             clearInterval(gameTimer)
+            //  過一秒跳出過關訊息
+              setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Yah!!',
+                    text: '恭喜過關!!',
+                    showClass: {
+                    popup: 'animate__animated animate__bounce'
+                    },
+                    hideClass: {
+                      popup: 'animate__animated animate__fadeOutUp'}
+                }).then(function(){
+                    location.reload();
+                })
+              }, 1000);
+           }
+            // 未在時間內配對完
+            else if(timeleft == 0 && $('.clear').length !== $(".card").length){
+              clearInterval(gameTimer)
+              setTimeout(()=>{
+                Swal.fire({
+                    icon: 'lose',
+                    title: '時間到!!',
+                    text: '再接再厲!!',
+                    showClass: {
+                    popup: 'animate__animated animate__bounce'
+                    },
+                    hideClass: {
+                      popup: 'animate__animated animate__fadeOutUp'}
+                  }).then(function(){
+                    location.reload();
+                })
+              },1000)
+            }
+       }, 1000)
+}
+
+// 點選首頁選項進入模式，標題、遊戲介面、計分計時區切換。
+// 選項一: 圖案
+$('#op1').click(function(){
+  game('A')
+})
+
+// 選項二: 星星
+$('#op2').click(function(){
+  game('B')
+})
+
+// 選項三: 簡約
+$('#op3').click(function(){
+  game('C')
+})
+
+
+
+    </script>
+</body>
+</html>
