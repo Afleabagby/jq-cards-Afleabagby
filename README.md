@@ -5,4 +5,4 @@
 請盡量使用上課教的 GUI 工具或 git 指令繳交作業  
 若使用 GitHub 網頁進行 commit 會依次數扣分
 
-[DEMO](https://afleabagby.github.io/jq-cards-Afleabagby/)
+[DEMO](https://afleabagby.github.io/jq-cards-Afleabagby/認星座圖首頁.html)
